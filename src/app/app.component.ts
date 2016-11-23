@@ -32,43 +32,56 @@ export class AppComponent {
         this.render.setClearColor('0x00ff00');
         this.render.setPixelRatio(window.devicePixelRatio);
         this.render.setSize(600,600);
-        
         this.setCamera();
         this.createScene();
-        this.createGeometry();
-        this.creatematerial();
         this.addLight();
+        this.loadObject();
         this.renderScene();
     }
     renderScene() {
         this.render.render(this.scene,this.camera);
-        this.mesh.rotation.x += 0.01;
-        this.mesh.rotation.y += 0.01;
+
         this.ngZone.runOutsideAngular(() => requestAnimationFrame(() => {this.renderScene()}) );
-        
     }
+
     addLight() {
-        this.AmbientLight = new THREE.AmbientLight(0xffffff,0.5);
-        this.PointLight = new THREE.PointLight(0xffffff,0.5);
-        this.scene.add(this.AmbientLight);
-        this.scene.add(this.PointLight);
+        let AmbientLight = new THREE.AmbientLight(0xffffff,0.5);
+        let PointLight = new THREE.PointLight(0xffffff,0.5);
+        let light = new THREE.PointLight( 0xFFFFDD );
+        light.position.set( -15, 10, 15 );
+        this.scene.add(AmbientLight);
+        this.scene.add(PointLight);
+        this.scene.add(light);
     }
     setCamera() {
-        this.camera = new THREE.PerspectiveCamera(35,window.innerWidth/window.innerHeight,0.1,3000);
-    }
-    createGeometry() {
-        this.cubeGeometry = new THREE.BoxGeometry(200, 200, 200);
-    }
-    creatematerial() {
-        this.material = new THREE.MeshLambertMaterial({color: 0xcfcfcf});
-        this.mesh = new THREE.Mesh(this.cubeGeometry,this.material);
-        this.mesh.position.set(0,0,-1000);
-        this.addMeshToScene();
+        this.camera = new THREE.PerspectiveCamera(35, window.innerWidth / 600, .1,10000);
+        this.camera.position.x = 2;
+        this.camera.position.z = 7;
+        this.camera.position.y = 1;
     }
     addMeshToScene() {
         this.scene.add(this.mesh);
     }
     createScene() {
         this.scene = new THREE.Scene();
+    }
+    swipe(unknow,direction) {
+        if(direction =="panleft") {
+            this.mesh.object.rotateX(10); 
+        } else if(direction =="panright"){
+            this.mesh.object.rotateX(10); 
+        } else {
+
+        }
+    }
+    
+    loadObject() {
+        let loader = new THREE.JSONLoader();
+        loader.load( "./assets/models/box.json", (geometry, materials)=> {
+            let material = new THREE.MeshFaceMaterial(materials);
+            this.mesh = new THREE.Mesh( geometry, material );
+            this.mesh.scale.set(1.5,1.5,1.5);
+            this.scene.add(this.mesh);
+        } );
     }
 }
